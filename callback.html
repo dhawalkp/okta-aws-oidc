@@ -10,6 +10,9 @@
     <p>
         <span id="results" style="color:#FF0000"></span>
     </p>
+    <p>
+        <span id="debug" style="color:#FF0000"></span>
+    </p>
 </body>
 <script type="text/javascript">          
     // Callback function called on page load 
@@ -27,14 +30,15 @@
         }
  
         // Extract id token from the id_token parameter
-        var match = url.match('id_token=([^&]*)');
+        var match = url.match('id_token=([^&]*)&access_token=([^&]*)');
         if (match) {
             var id_token = match[1]; // String captured by ([^&]*)
+            var access_token = match[2]
  
             // Make AWS request using the id token
             if (id_token) {
                 printMessage('<span style="color:#000000">Using id token from Okta to query DynamoDB . . .</span>');
-                makeCognitoRequest(id_token);
+                makeCognitoRequest(id_token, access_token);
             }else{
                 printMessage('Error: Could not retrieve id token from the URL');
             }
@@ -44,7 +48,7 @@
     }
  
     // Make AWS request using Cognito
-    function makeCognitoRequest(id_token) {
+    function makeCognitoRequest(id_token, access_token) {
         var aws_region = 'us-east-1';
         var provider_url = '{{oktaOrgProviderURL}}'; 
         var logins = {};
@@ -53,13 +57,12 @@
         // **** REPLACE pool_id and table_name WITH YOUR OWN VALUES ****
         var pool_id = '{{AWSCognitoPoolARN}}';
         var table_name = 'ProductCatalog';
-         
         // Parameters required for CognitoIdentityCredentials
         var params = {
             IdentityPoolId: pool_id,
             Logins: logins
         };
- 
+        printDebug("aws_region: " + aws_region + "<br>providerUrl: " + provider_url+"<br>id_token: "+id_token+"<br>access_token: "+access_token+"<br>pool_id: "+pool_id+"<br>table_name: "+table_name);
         // Amazon Cognito region
         AWS.config.region = aws_region;
  
@@ -90,12 +93,16 @@
                     }
                 });
             }
-        });      
+        }); 
     }
- 
+
     // Print messages  
     function printMessage(messageString){
        document.getElementById("results").innerHTML = messageString;
-    }    
+    }
+    function printDebug(messageString){
+       document.getElementById("debug").innerHTML = messageString;
+    }
+
 </script>
 </html>

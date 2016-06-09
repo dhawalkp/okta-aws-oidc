@@ -99,7 +99,7 @@ Runs with [http-server](https://github.com/indexzero/http-server)
 
 `jitsu install http-server`
 
-`node bin/http-server -S -C cert.pem -o`
+`node /bin/http-server -S -C cert.pem -o`
 
 This will start it up on `https://localhost:8080`
 
